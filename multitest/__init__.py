@@ -1,3 +1,5 @@
+__version__ = '0.1.0'
+
 import os
 import sys
 import time
@@ -68,7 +70,7 @@ def _run_test(name, runner_args):
 
 
 class MultiprocessTestRunner:
-    def __init__(self, stream=sys.stderr, descriptions=1, verbosity=1):
+    def __init__(self, stream=sys.stderr, descriptions=True, verbosity=1):
         self.stream = _WritelnDecorator(stream)
         self.runner_args = {'descriptions': descriptions, 'verbosity': verbosity}
 
@@ -129,3 +131,5 @@ class MultiprocessTestRunner:
             self.stream.writeln(')')
         else:
             self.stream.writeln('OK')
+
+__all__ = ['MultiprocessTestRunner']
