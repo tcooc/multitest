@@ -1,5 +1,6 @@
 import sys
 import time
+import traceback
 from StringIO import StringIO
 from multiprocessing import Pool, TimeoutError
 from unittest import defaultTestLoader, TestSuite, TextTestResult, TextTestRunner
@@ -62,19 +63,23 @@ class _AggregateTestResult:
         return self.successful
 
 
-def _run_test(name, runner_args):
-    stream = _WritelnDecorator(StringIO())
-    runner_args['stream'] = stream
+def _run_test(name, runner_args, runner_class=TextTestRunner):
+    try:
+        stream = _WritelnDecorator(StringIO())
+        runner_args['stream'] = stream
 
-    test = defaultTestLoader.loadTestsFromName(name)
-    runner = TextTestRunner(**runner_args)
+        test = defaultTestLoader.loadTestsFromName(name)
+        runner = TextTestRunner(**runner_args)
 
-    native_test_result = TextTestResult(
-        runner.stream, runner.runner_args['description'], runner.runner_args['verbosity'])
-    test(native_test_result)
+        native_test_result = runner_class(
+            runner.stream, runner_args['descriptions'], runner_args['verbosity'])
+        test(native_test_result)
 
-    test_result = _AggregateTestResult()
-    return stream.getvalue(), test_result.populate(native_test_result)
+        test_result = _AggregateTestResult()
+        return stream.getvalue(), test_result.populate(native_test_result)
+    except Exception:
+        # Pass exception info to parent process
+        raise Exception("".join(traceback.format_exception(*sys.exc_info())))
 
 
 class MultiprocessTestRunner(object):
