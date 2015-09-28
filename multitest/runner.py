@@ -80,7 +80,7 @@ def _run_test(name, runner_args, test=None, runner_class=TextTestRunner, result_
         return stream.getvalue(), test_result.populate(native_test_result)
     except Exception:
         # Pass exception info to parent process
-        raise Exception("".join(traceback.format_exception(*sys.exc_info())))
+        raise Exception(''.join(traceback.format_exception(*sys.exc_info())))
 
 
 class MultiprocessTestRunner(object):
@@ -114,17 +114,17 @@ class MultiprocessTestRunner(object):
             aggregate_test_results.merge(test_result)
 
         for test in tests:
-            worker_tasks.append(worker_pool.apply_async(_run_test, args=(test, self.runner_args)))
+            worker_tasks.append((test, worker_pool.apply_async(_run_test, args=(test, self.runner_args))))
         worker_pool.close()
 
-        try:
-            for worker_task in worker_tasks:
-                output, test_result = worker_task.get(self.timeout)
-                self.stream.write(output)
-                aggregate_test_results.merge(test_result)
-        except TimeoutError as e:
-            self.stream.writeln('a child process timed out')
-            raise e
+        for worker_task in worker_tasks:
+            try:
+                output, test_result = worker_task[1].get(self.timeout)
+            except TimeoutError as e:
+                self.stream.writeln('A child process timed out (%s)' % worker_task[0])
+                raise e
+            self.stream.write(output)
+            aggregate_test_results.merge(test_result)
         stop_time = time.time()
 
         self._print_test_results(start_time, stop_time, aggregate_test_results)
