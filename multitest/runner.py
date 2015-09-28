@@ -63,12 +63,13 @@ class _AggregateTestResult:
         return self.successful
 
 
-def _run_test(name, runner_args, runner_class=TextTestRunner, result_class=TextTestResult):
+def _run_test(name, runner_args, test=None, runner_class=TextTestRunner, result_class=TextTestResult):
     try:
         stream = _WritelnDecorator(StringIO())
         runner_args['stream'] = stream
 
-        test = defaultTestLoader.loadTestsFromName(name)
+        if test is None:
+            test = defaultTestLoader.loadTestsFromName(name)
         runner = runner_class(**runner_args)
 
         native_test_result = result_class(
@@ -96,7 +97,7 @@ class MultiprocessTestRunner(object):
         self.timeout = timeout
 
     def run(self, suite):
-        tests = self._create_tests_set(suite)
+        tests, failed = self._create_tests_set(suite)
 
         worker_pool = Pool(self.workers)
         worker_tasks = []
@@ -107,6 +108,11 @@ class MultiprocessTestRunner(object):
                                 .format(workers=self.workers, timeout=self.timeout))
 
         start_time = time.time()
+        for fail in failed:
+            output, test_result = _run_test(fail.__class__.__name__, self.runner_args, test=fail)
+            self.stream.write(output)
+            aggregate_test_results.merge(test_result)
+
         for test in tests:
             worker_tasks.append(worker_pool.apply_async(_run_test, args=(test, self.runner_args)))
         worker_pool.close()
@@ -129,15 +135,19 @@ class MultiprocessTestRunner(object):
         index = 0
         children = [suite]
         tests = set()
+        failed = []
         while index < len(children):
             child = children[index]
             if isinstance(child, TestSuite):
                 for suite_child in child:
                     children.append(suite_child)
+            elif child.__module__.startswith('unittest'):
+                # loader failed
+                failed.append(child)
             else:
                 tests.add('%s.%s' % (child.__module__, child.__class__.__name__))
             index += 1
-        return tests
+        return tests, failed
 
     def _print_test_results(self, start_time, stop_time, aggregate_test_results):
         run = aggregate_test_results.testsRun
