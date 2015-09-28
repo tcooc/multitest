@@ -63,15 +63,15 @@ class _AggregateTestResult:
         return self.successful
 
 
-def _run_test(name, runner_args, runner_class=TextTestRunner):
+def _run_test(name, runner_args, runner_class=TextTestRunner, result_class=TextTestResult):
     try:
         stream = _WritelnDecorator(StringIO())
         runner_args['stream'] = stream
 
         test = defaultTestLoader.loadTestsFromName(name)
-        runner = TextTestRunner(**runner_args)
+        runner = runner_class(**runner_args)
 
-        native_test_result = runner_class(
+        native_test_result = result_class(
             runner.stream, runner_args['descriptions'], runner_args['verbosity'])
         test(native_test_result)
 
