@@ -12,6 +12,7 @@ setup(
     download_url='https://pypi.python.org/pypi/multitest',
     packages=['multitest'],
     platforms=['any'],
+    keywords='unittest test multiprocessing',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
