@@ -5,8 +5,8 @@ setup(
     description='Multiprocess Unittest Runner',
     license='MIT License',
     version=multitest.__version__,
-    author='tcooc',
-    author_email='thcooc@gmail.com',
+    author=multitest.__author__,
+    author_email=multitest.__email__,
     url='https://github.com/tcooc/multitest',
     packages=['multitest'],
     classifiers=[
@@ -14,7 +14,7 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
         'Topic :: Software Development :: Testing',
     ],
 )
