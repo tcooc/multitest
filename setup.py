@@ -1,7 +1,7 @@
 from distutils.core import setup
 import multitest
 setup(
-    name = 'multitest',
+    name='multitest',
     description='Multiprocess Unittest Runner',
     long_description='Extends the standard unittest library to run on multiple processes.',
     license='MIT License',
