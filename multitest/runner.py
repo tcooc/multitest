@@ -125,6 +125,7 @@ class MultiprocessTestRunner(object):
                 raise e
             self.stream.write(output)
             aggregate_test_results.merge(test_result)
+        worker_pool.join()
         stop_time = time.time()
 
         self._print_test_results(start_time, stop_time, aggregate_test_results)
