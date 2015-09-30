@@ -6,7 +6,7 @@ from multiprocessing import Pool, TimeoutError
 from unittest import defaultTestLoader, TestSuite, TextTestResult, TextTestRunner
 
 DEFAULT_WORKERS = 4
-DEFAULT_TIMEOUT = 10
+DEFAULT_TIMEOUT = 30
 
 
 class _WritelnDecorator(object):

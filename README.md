@@ -9,7 +9,7 @@ If your tests depend on some external state, more work may be required to get te
 
 ### Usage
 
-    python -m multitest discovery --multitest-workers 4 --multititest-timeout 10 -t . -s .
+    python -m multitest discovery --multitest-workers 4 --multititest-timeout 30 -t . -s .
 
 `multitest` extends the standard `unittest` library, refer to `python -m unittest --help` for basic usage.
 
@@ -22,7 +22,7 @@ Additional parameters can be referred to with `python -m multitest --help`.
     from unittest import defaultTestLoader
     from multitest import MultiprocessTestRunner
     suite = defaultTestLoader.loadTestsFromModule(my_module) # load the test suites using any method
-    MultiprocessTestRunner(stream=my_stream, verbosity=2, workers=4, timeout=10).run(suite)
+    MultiprocessTestRunner(stream=my_stream, verbosity=2, workers=4, timeout=30).run(suite)
 
 ### Known Limitation(s)
 * Does not handle expectedFailures and unexpectedSuccesses
